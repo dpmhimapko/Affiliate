@@ -13,13 +13,14 @@ import GoCermin from './pages/GoCermin';
 import GoClean from './pages/GoClean';
 import { GoSelfieVip } from './pages/GoSelfieVip';
 import { GoSetup } from './pages/GoSetup';
+import GoVideo from './pages/GoVideo';
 import { FeatureGuide } from './pages/FeatureGuide';
 import { GoSettings } from './pages/GoSettings';
 import { auth, googleProvider, signInWithPopup, onAuthStateChanged, User, db } from './firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import Loader from './components/Loader';
 
-export type View = 'home' | 'featureGuide' | 'virtualTryOn' | 'goAesthetic' | 'goKids' | 'goFamily' | 'goModelVip' | 'goCermin' | 'goClean' | 'goSelfieVip' | 'goSetup' | 'goSettings';
+export type View = 'home' | 'featureGuide' | 'virtualTryOn' | 'goAesthetic' | 'goKids' | 'goFamily' | 'goModelVip' | 'goCermin' | 'goClean' | 'goSelfieVip' | 'goSetup' | 'goSettings' | 'goVideo';
 
 function LoginScreen() {
   const handleLogin = async () => {
@@ -71,6 +72,7 @@ function AppContent() {
         case 'goCermin': return <GoCermin />;
         case 'goClean': return <GoClean />;
         case 'goSelfieVip': return <GoSelfieVip />;
+        case 'goVideo': return <GoVideo />;
         case 'goSetup': return <GoSetup />;
         case 'goSettings': return <GoSettings />;
         default: return <HomePage />;

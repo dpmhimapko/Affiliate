@@ -4,7 +4,7 @@ import type { View } from '../../App';
 import { TryOnIcon } from '../icons/TryOnIcon';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SparklesIcon } from '../icons/SparklesIcon';
-import { X, Users, Smile, ShieldCheck, Eraser, ScanFace, Monitor, Info } from '../icons/LucideIcons';
+import { X, Users, Smile, ShieldCheck, Eraser, ScanFace, Monitor, Info, Video } from '../icons/LucideIcons';
 import { HomeIcon } from '../icons/HomeIcon';
 import { MirrorIcon } from '../icons/MirrorIcon';
 import { Settings } from '../icons/LucideIcons';
@@ -64,6 +64,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isM
           { id: 'goFamily', label: t('sidebar.goFamily'), icon: <Users /> },
           { id: 'goAesthetic', label: t('sidebar.goAesthetic'), icon: <SparklesIcon /> },
           { id: 'goCermin', label: t('sidebar.goCermin'), icon: <MirrorIcon /> },
+        ]
+      },
+      {
+        title: "Video",
+        items: [
+          { id: 'goVideo', label: t('sidebar.goVideo'), icon: <Video /> },
         ]
       },
       {

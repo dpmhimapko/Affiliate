@@ -22,6 +22,7 @@ const MagicVideoGenerator: React.FC = () => {
     const [showVideoLinks, setShowVideoLinks] = useState(false);
 
     const handleImageUpload = (dataUrl: string, mimeType: string) => {
+        if (!dataUrl || !dataUrl.includes(',')) return;
         const base64 = dataUrl.split(',')[1];
         setInspirationImage({ base64, mimeType, dataUrl });
         setEnhancedPrompt(null);

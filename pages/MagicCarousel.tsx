@@ -163,6 +163,7 @@ const MagicCarousel: React.FC = () => {
             const reader = new FileReader();
             reader.onload = e => {
                 const dataUrl = e.target?.result as string;
+                if (!dataUrl || !dataUrl.includes(',')) return;
                 const [header, base64] = dataUrl.split(',');
                 const mimeType = header.match(/:(.*?);/)?.[1] || 'image/png';
                 setProductImage({ base64, mimeType, name: processedFile.name, dataUrl });
@@ -332,7 +333,7 @@ const MagicCarousel: React.FC = () => {
                                     <div>
                                     <h4 className="font-medium text-xs mb-2 text-slate-600 dark:text-slate-400">Tampilan</h4>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                                            {['Minimalis & Cerah', 'Elegan & Mewah', 'Modern & Gelap', 'Warna-warni & Ceria'].map(s => <OptionButton key={s} onClick={() => setVisualStyle(s)} selected={visualStyle === s} className="flex items-center justify-center text-center">{s.split(' &')[0]}</OptionButton>)}
+                                            {['Minimalis & Cerah', 'Elegan & Mewah', 'Modern & Gelap', 'Warna-warni & Ceria'].map(s => <OptionButton key={s} onClick={() => setVisualStyle(s)} selected={visualStyle === s} className="flex items-center justify-center text-center">{(s || '').split(' &')[0]}</OptionButton>)}
                                     </div>
                                 </div>
                             </div>
@@ -478,6 +479,7 @@ const CarouselResult: React.FC<{ result: any }> = ({ result }) => {
     };
 
     const drawText = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+        if (!text) return;
         const words = text.split(' ');
         let line = '';
         let currentY = y;
@@ -526,7 +528,8 @@ const CarouselResult: React.FC<{ result: any }> = ({ result }) => {
                             const padding = canvas.width * 0.08;
                             const fontSize = canvas.width * 0.055;
                             const lineHeight = fontSize * 1.3;
-                            ctx.font = `bold ${fontSize}px ${slide.font.split(',')[0].replace(/'/g, '')}, sans-serif`;
+                            const fontName = (slide.font || '').split(',')[0].replace(/'/g, '');
+                            ctx.font = `bold ${fontSize}px ${fontName}, sans-serif`;
                             ctx.fillStyle = slide.fontColor;
                             ctx.textAlign = 'center';
                             ctx.shadowColor = 'rgba(0,0,0,0.7)';
@@ -541,7 +544,7 @@ const CarouselResult: React.FC<{ result: any }> = ({ result }) => {
                             if (slide.position.includes('top')) {
                                 y = padding + fontSize;
                             } else if (slide.position.includes('bottom')) {
-                                const words = slide.text.split(' ');
+                                const words = (slide.text || '').split(' ');
                                 let linesCount = 1;
                                 let line = '';
                                 for(let n=0; n<words.length; n++){
@@ -553,7 +556,7 @@ const CarouselResult: React.FC<{ result: any }> = ({ result }) => {
                                 }
                                 y = canvas.height - padding - (linesCount - 1) * lineHeight;
                             } else {
-                                const words = slide.text.split(' ');
+                                const words = (slide.text || '').split(' ');
                                 let linesCount = 1;
                                 let line = '';
                                 for(let n=0; n<words.length; n++){

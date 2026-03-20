@@ -30,7 +30,7 @@ function toPart(image: UploadedImage | ImageData | null): Part {
     
     const base64 = 'base64' in image 
         ? image.base64 
-        : (image as any).dataUrl?.split(',')[1];
+        : (image as any).dataUrl?.includes(',') ? (image as any).dataUrl.split(',')[1] : undefined;
     
     // Safety check: Gemini API rejects parts with empty or missing data/text
     if (!base64 || base64.trim() === "") {
@@ -311,13 +311,32 @@ export const generateVideo = async (prompt: string, image: ImageData) => {
         model: 'veo-3.1-fast-generate-preview',
         prompt: prompt,
         image: {
-            imageBytes: image.dataUrl.split(',')[1],
+            imageBytes: (image.dataUrl || '').includes(',') ? image.dataUrl.split(',')[1] : (image.dataUrl || ''),
             mimeType: image.mimeType,
         },
         config: {
             numberOfVideos: 1,
             resolution: '720p',
             aspectRatio: '16:9'
+        }
+    });
+    while (!operation.done) {
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        operation = await ai.operations.getVideosOperation({ operation: operation });
+    }
+    return operation.response?.generatedVideos?.[0]?.video?.uri;
+};
+
+export const generateTextToVideo = async (prompt: string, aspectRatio: string = '16:9') => {
+    const apiKey = await getApiKey();
+    const ai = new GoogleGenAI({ apiKey });
+    let operation = await ai.models.generateVideos({
+        model: 'veo-3.1-fast-generate-preview',
+        prompt: prompt,
+        config: {
+            numberOfVideos: 1,
+            resolution: '720p',
+            aspectRatio: aspectRatio as any
         }
     });
     while (!operation.done) {
@@ -394,7 +413,7 @@ export const generateMergedImage = async (images: UploadedImage[], prompt: strin
         }
     });
     const imageUrl = await extractImageFromResponse(response);
-    return imageUrl.split(',')[1];
+    return (imageUrl || '').includes(',') ? imageUrl.split(',')[1] : (imageUrl || '');
 };
 
 // =================== Go Lifestyle ===================
@@ -775,7 +794,7 @@ export const suggestNextStoryboardScenes = async (lastScene: { visual_prompt: st
     const ai = new GoogleGenAI({ apiKey });
     const parts: Part[] = [
         { text: `Based on the last scene "${lastScene.narration}", suggest 4 possible next scenes. Return visual_prompt and narration for each in JSON.` },
-        { inlineData: { data: lastScene.imageUrl.split(',')[1], mimeType: 'image/png' } }
+        { inlineData: { data: (lastScene.imageUrl || '').includes(',') ? lastScene.imageUrl.split(',')[1] : (lastScene.imageUrl || ''), mimeType: 'image/png' } }
     ];
     if (reference) parts.push(toPart(reference));
 

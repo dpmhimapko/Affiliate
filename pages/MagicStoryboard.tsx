@@ -93,6 +93,7 @@ const MagicStoryboard: React.FC = () => {
     const [promptModal, setPromptModal] = useState<{ isOpen: boolean; title: string; content: string }>({ isOpen: false, title: '', content: '' });
 
     const handleImageUpload = (dataUrl: string, mimeType: string) => {
+        if (!dataUrl || !dataUrl.includes(',')) return;
         const base64 = dataUrl.split(',')[1];
         dispatch({ type: 'SET_FIELD', payload: { field: 'referenceImage', value: { base64, mimeType, dataUrl } } });
     };
@@ -109,8 +110,9 @@ const MagicStoryboard: React.FC = () => {
             for (let i = 0; i < scenes.length; i++) {
                 const res = await visualizeStoryboardScene(scenes[i], aspectRatio, i, referenceImage, previousImage);
                 dispatch({ type: 'UPDATE_PANEL_IMAGE', payload: { index: i, imageUrl: res.imageUrl } });
+                const base64 = (res.imageUrl || '').includes(',') ? res.imageUrl.split(',')[1] : (res.imageUrl || '');
                 previousImage = {
-                    base64: res.imageUrl.split(',')[1],
+                    base64,
                     mimeType: 'image/png',
                     name: `scene_${i}.png`
                 };
@@ -154,9 +156,10 @@ const MagicStoryboard: React.FC = () => {
         dispatch({ type: 'SUGGEST_START' });
         try {
             const options = await suggestNextStoryboardScenes(lastScene as any, referenceImage);
+            const base64 = (lastScene.imageUrl || '').includes(',') ? lastScene.imageUrl.split(',')[1] : (lastScene.imageUrl || '');
             const results = await Promise.all(options.map(opt => 
                 visualizeStoryboardScene(opt, aspectRatio, mainStoryboard.length, referenceImage, {
-                    base64: lastScene.imageUrl!.split(',')[1],
+                    base64,
                     mimeType: 'image/png'
                 })
             ));
